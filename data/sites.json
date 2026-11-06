@@ -1,0 +1,311 @@
+{
+  "py": {
+    "sites": [
+      {
+        "id": "itaipu", "type": "dam", "lon": -54.5891, "lat": -25.4081, "labelK": 1,
+        "name": { "es": "Itaipu Binacional", "en": "Itaipu Binacional" },
+        "facts": [
+          { "k": "units", "v": { "es": "20 × 700 MW (10 a 50 Hz, 10 a 60 Hz)", "en": "20 × 700 MW (10 at 50 Hz, 10 at 60 Hz)" } },
+          { "k": "capacity", "v": { "es": "14 000 MW", "en": "14,000 MW" } },
+          { "k": "start", "v": { "es": "1984 (primera unidad, 5 de mayo); 2007 (últimas dos)", "en": "1984 (first unit, 5 May); 2007 (last two units)" } },
+          { "k": "river", "v": { "es": "Río Paraná (Paraguay–Brasil)", "en": "Paraná River (Paraguay–Brazil)" } }
+        ],
+        "role": {
+          "es": "Diez unidades generan a 50 Hz para Paraguay y diez a 60 Hz para Brasil. La energía de 50 Hz que no consume Paraguay se convierte en el lado brasileño y viaja en corriente continua.",
+          "en": "Ten units generate at 50 Hz for Paraguay and ten at 60 Hz for Brazil. The 50 Hz energy that Paraguay does not use is converted on the Brazilian side and sent as direct current."
+        },
+        "src": [
+          { "t": "Itaipu Binacional – Perguntas frequentes", "u": "https://www.itaipu.gov.br/contatos/perguntas-frequentes" },
+          { "t": "Itaipu Binacional – Casa de Força", "u": "https://www.itaipu.gov.br/energia/geracao/casa-de-forca" },
+          { "t": "Itaipu Binacional – Nossa História", "u": "https://www.itaipu.gov.br/institucional/sobre-itaipu/nossa-historia" }
+        ]
+      },
+      {
+        "id": "foz", "minK": 4, "type": "dc", "lon": -54.5425, "lat": -25.4661, "labelK": 12,
+        "name": { "es": "Estación conversora Foz do Iguaçu", "en": "Foz do Iguaçu converter station" },
+        "short": { "es": "Foz do Iguaçu", "en": "Foz do Iguaçu" },
+        "facts": [
+          { "k": "conversion", "v": { "es": "CA 50 Hz, 500 kV → CC ±600 kV", "en": "50 Hz AC, 500 kV → ±600 kV DC" } },
+          { "k": "capacity", "v": { "es": "6300 MW (2 bipolos × 3150 MW)", "en": "6,300 MW (2 bipoles × 3,150 MW)" } },
+          { "k": "start", "v": { "es": "1984 (bipolo 1), 1987 (bipolo 2)", "en": "1984 (bipole 1), 1987 (bipole 2)" } },
+          { "k": "operator", "v": { "es": "Eletrobras Furnas", "en": "Eletrobras Furnas" } }
+        ],
+        "role": {
+          "es": "Convierte en corriente continua la energía de 50 Hz de Itaipu y la envía unos 800 km hasta Ibiúna (São Paulo).",
+          "en": "Turns Itaipu's 50 Hz output into direct current and sends it about 800 km to Ibiúna (São Paulo)."
+        },
+        "src": [
+          { "t": "Eletrobras (17/05/2024)", "u": "https://eletrobras.com/pt/Paginas/Noticia.aspx?ID=1374" },
+          { "t": "EPE/ONS – Modernização do Sistema CCAT de Itaipu (2020)", "u": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-276/topico-525/NT(EPE-ONS)-Moderniza%C3%A7%C3%A3o%20Itaipu-CCAT.pdf" }
+        ]
+      },
+      {
+        "id": "ibiuna", "type": "dc", "lon": -47.1053, "lat": -23.6672, "labelK": 2.5,
+        "name": { "es": "Estación conversora Ibiúna", "en": "Ibiúna converter station" },
+        "short": { "es": "Ibiúna", "en": "Ibiúna" },
+        "facts": [
+          { "k": "conversion", "v": { "es": "CC ±600 kV → CA 60 Hz", "en": "±600 kV DC → 60 Hz AC" } },
+          { "k": "capacity", "v": { "es": "6300 MW (2 bipolos)", "en": "6,300 MW (2 bipoles)" } },
+          { "k": "start", "v": { "es": "1984 (bipolo 1), 1987 (bipolo 2)", "en": "1984 (bipole 1), 1987 (bipole 2)" } },
+          { "k": "operator", "v": { "es": "Eletrobras Furnas", "en": "Eletrobras Furnas" } }
+        ],
+        "role": {
+          "es": "Extremo del enlace de corriente continua de Itaipu: entrega la energía a la red brasileña de 60 Hz, en el estado de São Paulo.",
+          "en": "End of the Itaipu DC link: delivers the energy to Brazil's 60 Hz grid in the state of São Paulo."
+        },
+        "src": [
+          { "t": "Eletrobras (17/05/2024)", "u": "https://eletrobras.com/pt/Paginas/Noticia.aspx?ID=1374" },
+          { "t": "EPE/ONS – Modernização do Sistema CCAT de Itaipu (2020)", "u": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-276/topico-525/NT(EPE-ONS)-Moderniza%C3%A7%C3%A3o%20Itaipu-CCAT.pdf" }
+        ]
+      },
+      {
+        "id": "acaray", "minK": 4, "type": "dam", "lon": -54.6292, "lat": -25.4594, "labelK": 12, "labelLeft": true,
+        "name": { "es": "Central Hidroeléctrica Acaray", "en": "Acaray hydropower plant" },
+        "short": { "es": "Acaray", "en": "Acaray" },
+        "facts": [
+          { "k": "units", "v": { "es": "4 grupos: 2 × 56 MVA (50 Hz), 2 × 60,7 MVA (50/60 Hz)", "en": "4 units: 2 × 56 MVA (50 Hz), 2 × 60.7 MVA (50/60 Hz)" } },
+          { "k": "capacity", "v": { "es": "233,4 MVA", "en": "233.4 MVA" } },
+          { "k": "start", "v": { "es": "1968 (Acaray I, 16 de diciembre)", "en": "1968 (Acaray I, 16 December)" } },
+          { "k": "operator", "v": { "es": "ANDE", "en": "ANDE" } }
+        ],
+        "role": {
+          "es": "Primera gran central hidroeléctrica de Paraguay, sobre el río Acaray. Junto a ella hay una conversora de frecuencia de 50 MW de ANDE hacia Brasil, fuera de servicio desde 2007 según EPE.",
+          "en": "Paraguay's first large hydropower plant, on the Acaray River. Next to it is a 50 MW ANDE frequency converter towards Brazil, out of service since 2007 according to EPE."
+        },
+        "src": [
+          { "t": "ANDE – Central Hidroeléctrica Acaray", "u": "https://www.ande.gov.py/documentos/CH-ACARAY-WEB.pdf" },
+          { "t": "EPE – Integração Energética Regional (2018)", "u": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-227/topico-457/Integracao%20Energetica%20Regional.pdf" }
+        ]
+      },
+      {
+        "id": "yacyreta", "type": "dam", "lon": -56.725, "lat": -27.4827, "labelK": 2.5,
+        "name": { "es": "Central Hidroeléctrica Yacyretá", "en": "Yacyretá hydropower plant" },
+        "short": { "es": "Yacyretá", "en": "Yacyretá" },
+        "facts": [
+          { "k": "units", "v": { "es": "20 × 155 MW (Kaplan), 50 Hz", "en": "20 × 155 MW (Kaplan), 50 Hz" } },
+          { "k": "capacity", "v": { "es": "3100 MW", "en": "3,100 MW" } },
+          { "k": "start", "v": { "es": "1994 (unidad 1); 1998 (unidad 20)", "en": "1994 (unit 1); 1998 (unit 20)" } },
+          { "k": "river", "v": { "es": "Río Paraná (Paraguay–Argentina)", "en": "Paraná River (Paraguay–Argentina)" } }
+        ],
+        "role": {
+          "es": "Represa binacional entre dos países de 50 Hz: todas sus unidades generan a 50 Hz.",
+          "en": "A binational dam between two 50 Hz countries: all its units generate at 50 Hz."
+        },
+        "src": [
+          { "t": "EBY – Central Hidroeléctrica", "u": "https://www.eby.gov.py/central-hidroelectrica-eby/" },
+          { "t": "EBY – 30 años generando energía (2024)", "u": "https://www.eby.gov.py/30-anos-generando-energia-sin-descanso-para-el-desarrollo-del-pueblo-paraguayo/" }
+        ]
+      },
+      {
+        "id": "garabi", "type": "fc", "lon": -55.6717, "lat": -28.2553, "labelK": 2.5,
+        "name": { "es": "Conversora de frecuencia Garabi", "en": "Garabi frequency converter" },
+        "short": { "es": "Garabi", "en": "Garabi" },
+        "facts": [
+          { "k": "capacity", "v": { "es": "2200 MW (Garabi 1 + 2, 1100 MW cada una)", "en": "2,200 MW (Garabi 1 + 2, 1,100 MW each)" } },
+          { "k": "start", "v": { "es": "2000 (Garabi 1), 2002 (Garabi 2)", "en": "2000 (Garabi 1), 2002 (Garabi 2)" } },
+          { "k": "location", "v": { "es": "Garruchos (RS, Brasil)", "en": "Garruchos (RS, Brazil)" } }
+        ],
+        "role": {
+          "es": "Une la red argentina de 50 Hz con la brasileña de 60 Hz.",
+          "en": "Links Argentina's 50 Hz grid with Brazil's 60 Hz grid."
+        },
+        "src": [
+          { "t": "ONS – Relatório de Intercâmbio Internacional (05/2021)", "u": "https://www.ons.org.br/AcervoDigitalDocumentosEPublicacoes/Relat%C3%B3rio%20de%20Intercambio%20Internacional_05%2021.pdf" }
+        ]
+      },
+      {
+        "id": "rivera", "type": "fc", "lon": -55.5594, "lat": -30.9414, "labelK": 2.5, "labelLeft": true,
+        "name": { "es": "Conversora de frecuencia Rivera", "en": "Rivera frequency converter" },
+        "short": { "es": "Rivera", "en": "Rivera" },
+        "facts": [
+          { "k": "capacity", "v": { "es": "70 MW", "en": "70 MW" } },
+          { "k": "start", "v": { "es": "2001", "en": "2001" } },
+          { "k": "location", "v": { "es": "Rivera (Uruguay), conectada a Livramento 2 (Brasil)", "en": "Rivera (Uruguay), connected to Livramento 2 (Brazil)" } }
+        ],
+        "role": {
+          "es": "Une la red uruguaya de 50 Hz con la brasileña de 60 Hz.",
+          "en": "Links Uruguay's 50 Hz grid with Brazil's 60 Hz grid."
+        },
+        "src": [
+          { "t": "ONS – Relatório de Intercâmbio Internacional (05/2021)", "u": "https://www.ons.org.br/AcervoDigitalDocumentosEPublicacoes/Relat%C3%B3rio%20de%20Intercambio%20Internacional_05%2021.pdf" }
+        ]
+      },
+      {
+        "id": "melo", "type": "fc", "lon": -54.0928, "lat": -32.4172, "labelK": 2.5,
+        "name": { "es": "Conversora de frecuencia Melo", "en": "Melo frequency converter" },
+        "short": { "es": "Melo", "en": "Melo" },
+        "facts": [
+          { "k": "capacity", "v": { "es": "500 MW (back-to-back)", "en": "500 MW (back-to-back)" } },
+          { "k": "start", "v": { "es": "2016 (operación comercial, 5 de agosto)", "en": "2016 (commercial operation, 5 August)" } },
+          { "k": "location", "v": { "es": "Melo (Uruguay); línea de 500 kV a Candiota (Brasil)", "en": "Melo (Uruguay); 500 kV line to Candiota (Brazil)" } }
+        ],
+        "role": {
+          "es": "Une la red uruguaya de 50 Hz con la brasileña de 60 Hz.",
+          "en": "Links Uruguay's 50 Hz grid with Brazil's 60 Hz grid."
+        },
+        "src": [
+          { "t": "EPE – Integração Energética Regional (2018)", "u": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-227/topico-457/Integracao%20Energetica%20Regional.pdf" }
+        ]
+      }
+    ],
+    "links": [
+      { "from": [-54.5425, -25.4661], "to": [-47.1053, -23.6672] }
+    ]
+  },
+  "jp": {
+    "sites": [
+      {
+        "id": "sakuma", "type": "fc", "lon": 137.80, "lat": 35.08, "labelK": 2, "labelLeft": true,
+        "name": { "en": "Sakuma Frequency Converter Station", "ja": "佐久間周波数変換所" },
+        "short": { "en": "Sakuma", "ja": "佐久間" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "300 MW (30万kW)", "ja": "30万kW" } },
+          { "k": "start", "v": { "en": "October 1965", "ja": "1965年10月" } },
+          { "k": "location", "v": { "en": "Hamamatsu, Shizuoka", "ja": "静岡県浜松市" } },
+          { "k": "operator", "v": { "en": "J-POWER Transmission Network", "ja": "電源開発送変電ネットワーク" } }
+        ],
+        "role": {
+          "en": "Japan's first frequency converter. It made power exchange between the 50 Hz east and the 60 Hz west possible for the first time.",
+          "ja": "日本で最初の周波数変換所。周波数の異なる東西の間で、初めて電力の融通ができるようになりました。"
+        },
+        "src": [
+          { "t": "J-POWER 歴史", "u": "https://www.jpower.co.jp/company_info/history/" },
+          { "t": "J-POWER送変電 事業紹介", "u": "https://www.jpower.co.jp/tn/business/about.html" }
+        ]
+      },
+      {
+        "id": "shinshinano", "type": "fc", "lon": 137.87, "lat": 36.11, "labelK": 2,
+        "name": { "en": "Shin-Shinano Substation (frequency converters)", "ja": "新信濃変電所（周波数変換設備）" },
+        "short": { "en": "Shin-Shinano", "ja": "新信濃" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "600 MW (2 × 300 MW) + Hida–Shinano 900 MW", "ja": "60万kW（30万kW×2）＋飛騨信濃 90万kW" } },
+          { "k": "location", "v": { "en": "Asahi, Nagano", "ja": "長野県東筑摩郡朝日村" } },
+          { "k": "operator", "v": { "en": "TEPCO Power Grid", "ja": "東京電力パワーグリッド" } }
+        ],
+        "role": {
+          "en": "Converter station on the 50 Hz side. Also the eastern end of the Hida–Shinano DC line.",
+          "ja": "50Hz 側の変換所。飛騨信濃直流幹線の東の端でもあります。"
+        },
+        "src": [
+          { "t": "電気事業連合会 Enelog vol.40", "u": "https://www.fepc.or.jp/enelog/cover/vol_40.html" },
+          { "t": "東京電力（2012）", "u": "https://www.tepco.co.jp/cc/direct/1211491_1992.html" }
+        ]
+      },
+      {
+        "id": "hida", "type": "fc", "lon": 137.38, "lat": 36.17, "labelK": 2, "labelLeft": true,
+        "name": { "en": "Hida Converter Station (Hida–Shinano FC)", "ja": "飛騨変換所（飛騨信濃周波数変換設備）" },
+        "short": { "en": "Hida", "ja": "飛騨" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "900 MW (2 × 450 MW), DC 200 kV", "ja": "90万kW（45万kW×2）、直流200kV" } },
+          { "k": "start", "v": { "en": "31 March 2021", "ja": "2021年3月31日" } },
+          { "k": "location", "v": { "en": "Takayama, Gifu", "ja": "岐阜県高山市" } },
+          { "k": "operator", "v": { "en": "Chubu Electric Power Grid / TEPCO Power Grid", "ja": "中部電力パワーグリッド・東京電力パワーグリッド" } }
+        ],
+        "role": {
+          "en": "60 Hz end of an 89 km DC line to Shin-Shinano. With it, east–west converter capacity rose from 1.2 GW to 2.1 GW.",
+          "ja": "新信濃変電所との間を 89km の直流送電線で結ぶ、60Hz 側の変換所。これにより東西の周波数変換容量は 120万kW から 210万kW になりました。"
+        },
+        "src": [
+          { "t": "中部電力パワーグリッド（2021-04-01）", "u": "https://powergrid.chuden.co.jp/news/press/1206089_3281.html" }
+        ]
+      },
+      {
+        "id": "higashishimizu", "type": "fc", "lon": 138.47, "lat": 35.06, "labelK": 2,
+        "name": { "en": "Higashi-Shimizu Frequency Converter", "ja": "東清水周波数変換所" },
+        "short": { "en": "Higashi-Shimizu", "ja": "東清水" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "300 MW (600 MW more planned)", "ja": "30万kW（60万kW の増設を計画）" } },
+          { "k": "start", "v": { "en": "2006 (100 MW, partial); 2013 (300 MW)", "ja": "2006年（10万kW・一部運用）、2013年（30万kW）" } },
+          { "k": "location", "v": { "en": "Shimizu Ward, Shizuoka City", "ja": "静岡県静岡市清水区" } },
+          { "k": "operator", "v": { "en": "Chubu Electric Power Grid", "ja": "中部電力パワーグリッド" } }
+        ],
+        "role": {
+          "en": "Converter close to the Fuji River, the 50/60 Hz boundary in Shizuoka.",
+          "ja": "静岡県内の境目である富士川に近い周波数変換所。"
+        },
+        "src": [
+          { "t": "中部電力（2013-02-15）", "u": "https://www.chuden.co.jp/publicity/press/3210032_6926.html" },
+          { "t": "OCCTO 第101回広域系統整備委員会 資料1（2026-05-22）", "u": "https://www.occto.or.jp/assets/iinkai/kouikikeitouseibi/101/seibi_101_01_01.pdf" }
+        ]
+      },
+      {
+        "id": "hakodate", "type": "dc", "lon": 140.68, "lat": 41.90, "labelK": 3,
+        "name": { "en": "Hakodate Converter Station (Hokkaido–Honshu HVDC)", "ja": "函館変換所（北本連系）" },
+        "short": { "en": "Hakodate", "ja": "函館" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "600 MW (2 poles × 300 MW)", "ja": "60万kW（30万kW×2極）" } },
+          { "k": "start", "v": { "en": "1979 (pole 1), 1993 (pole 2)", "ja": "1979年（第1極）、1993年（第2極）" } },
+          { "k": "location", "v": { "en": "Nanae, Hokkaido", "ja": "北海道亀田郡七飯町" } },
+          { "k": "operator", "v": { "en": "J-POWER Transmission Network", "ja": "電源開発送変電ネットワーク" } }
+        ],
+        "role": {
+          "en": "Hokkaido end of the Hokkaido–Honshu DC link to Kamikita (Aomori). Both islands are 50 Hz; DC is used for the long undersea crossing.",
+          "ja": "上北変換所（青森県）と結ぶ北本連系の北海道側。両側とも 50Hz ですが、長い海峡を越えるため直流で送ります。"
+        },
+        "src": [
+          { "t": "J-POWER 歴史", "u": "https://www.jpower.co.jp/company_info/history/" },
+          { "t": "OCCTO 第90回広域系統整備委員会 資料（2025-06-25）", "u": "https://www.occto.or.jp/assets/iinkai/kouikikeitouseibi/2025/files/seibi_90_02_01.pdf" }
+        ]
+      },
+      {
+        "id": "kamikita", "type": "dc", "lon": 141.27, "lat": 40.78, "labelK": 3,
+        "name": { "en": "Kamikita Converter Station (Hokkaido–Honshu HVDC)", "ja": "上北変換所（北本連系）" },
+        "short": { "en": "Kamikita", "ja": "上北" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "600 MW", "ja": "60万kW" } },
+          { "k": "start", "v": { "en": "1979 (pole 1), 1993 (pole 2)", "ja": "1979年（第1極）、1993年（第2極）" } },
+          { "k": "location", "v": { "en": "Tohoku Town, Aomori", "ja": "青森県上北郡東北町" } },
+          { "k": "operator", "v": { "en": "J-POWER Transmission Network", "ja": "電源開発送変電ネットワーク" } }
+        ],
+        "role": {
+          "en": "Honshu end of the Hokkaido–Honshu DC link.",
+          "ja": "北本連系の本州側の変換所。"
+        },
+        "src": [
+          { "t": "J-POWER（2012-07-19）", "u": "https://www.jpower.co.jp/news/2012/07/news120719.html" },
+          { "t": "OCCTO 第90回広域系統整備委員会 資料（2025-06-25）", "u": "https://www.occto.or.jp/assets/iinkai/kouikikeitouseibi/2025/files/seibi_90_02_01.pdf" }
+        ]
+      },
+      {
+        "id": "hokuto", "minK": 2, "type": "dc", "lon": 140.62, "lat": 41.87, "labelK": 3, "labelLeft": true,
+        "name": { "en": "Hokuto Converter Station (New Hokkaido–Honshu HVDC)", "ja": "北斗変換所（新北本連系）" },
+        "short": { "en": "Hokuto", "ja": "北斗" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "300 MW, DC 250 kV, about 122 km", "ja": "30万kW、直流250kV、亘長約122km" } },
+          { "k": "start", "v": { "en": "28 March 2019", "ja": "2019年3月28日" } },
+          { "k": "operator", "v": { "en": "Hokkaido Electric Power Network", "ja": "北海道電力ネットワーク" } }
+        ],
+        "role": {
+          "en": "Hokkaido end of the New Hokkaido–Honshu link through the Seikan Tunnel to Imabetsu. Total Hokkaido–Honshu capacity became 900 MW; 300 MW more is planned (end of FY2027).",
+          "ja": "青函トンネルを通って今別変換所と結ぶ新北本連系の北海道側。北海道・本州間の容量は 90万kW になり、さらに 30万kW の増強が計画されています（2027年度末）。"
+        },
+        "src": [
+          { "t": "北海道電力（2019-03-28）", "u": "https://www.hepco.co.jp/info/2018/1238121_1753.html" },
+          { "t": "OCCTO 第101回広域系統整備委員会 資料1（2026-05-22）", "u": "https://www.occto.or.jp/assets/iinkai/kouikikeitouseibi/101/seibi_101_01_01.pdf" }
+        ]
+      },
+      {
+        "id": "imabetsu", "type": "dc", "lon": 140.48, "lat": 41.17, "labelK": 3, "labelLeft": true,
+        "name": { "en": "Imabetsu Converter Station (New Hokkaido–Honshu HVDC)", "ja": "今別変換所（新北本連系）" },
+        "short": { "en": "Imabetsu", "ja": "今別" },
+        "facts": [
+          { "k": "capacity", "v": { "en": "300 MW", "ja": "30万kW" } },
+          { "k": "start", "v": { "en": "28 March 2019", "ja": "2019年3月28日" } },
+          { "k": "operator", "v": { "en": "Hokkaido Electric Power Network", "ja": "北海道電力ネットワーク" } }
+        ],
+        "role": {
+          "en": "Honshu end of the New Hokkaido–Honshu link.",
+          "ja": "新北本連系の本州側の変換所。"
+        },
+        "src": [
+          { "t": "北海道電力 北海道本州間連系設備増強の概要（2013）", "u": "https://www.hepco.co.jp/info/2013/__icsFiles/afieldfile/2013/07/31/130731_2.pdf" }
+        ]
+      }
+    ],
+    "links": [
+      { "from": [137.38, 36.17], "to": [137.87, 36.11] },
+      { "from": [140.68, 41.90], "to": [141.27, 40.78] },
+      { "from": [140.62, 41.87], "to": [140.48, 41.17] }
+    ]
+  }
+}

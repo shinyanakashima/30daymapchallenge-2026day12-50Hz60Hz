@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where 50 Hz meets 60 Hz</title>
+<meta name="description" content="Where 50 Hz meets 60 Hz: Paraguay (Itaipu) and Japan. #30DayMapChallenge 2026 Day 12 Power.">
+<meta property="og:title" content="Where 50 Hz meets 60 Hz">
+<meta property="og:description" content="Paraguay and Japan: where mains frequency changes from 50 Hz to 60 Hz.">
+<meta property="og:image" content="docs/screenshot.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="tag">#30DayMapChallenge 2026 · Day 12 · Power</span>
+    <span class="site-title">Where 50 Hz meets 60 Hz</span>
+  </div>
+  <nav class="switches">
+    <div class="seg" role="group" id="view-switch" aria-label="View">
+      <button type="button" data-view="py">Paraguay</button>
+      <button type="button" data-view="jp">Japan</button>
+    </div>
+    <div class="seg" role="group" id="lang-switch" aria-label="Language"></div>
+  </nav>
+</header>
+
+<main class="layout">
+  <section class="mapwrap" id="mapwrap">
+    <canvas id="map" aria-hidden="true"></canvas>
+    <div id="markers" class="markers"></div>
+    <div class="map-tools">
+      <div class="seg small" id="zoom-presets" role="group"></div>
+      <button type="button" class="ghost" id="motion-toggle"></button>
+    </div>
+    <p class="map-note" id="map-note"></p>
+    <div id="popup" class="popup" role="dialog" aria-modal="false" hidden>
+      <button type="button" class="close" id="popup-close" aria-label="Close">×</button>
+      <div id="popup-body"></div>
+    </div>
+  </section>
+
+  <aside class="panel" id="panel">
+    <h1 id="view-title"></h1>
+    <p class="subtitle" id="view-subtitle"></p>
+    <p class="lede" id="lede"></p>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="sound">
+      <h2 id="sound-title"></h2>
+      <div class="sound-row">
+        <button type="button" class="tone" data-hz="50"></button>
+        <button type="button" class="tone" data-hz="60"></button>
+      </div>
+      <p class="hint" id="sound-hint"></p>
+    </div>
+
+    <div id="feature"></div>
+
+    <details class="notes" id="notes">
+      <summary id="notes-title"></summary>
+      <div id="notes-body"></div>
+    </details>
+  </aside>
+</main>
+
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
