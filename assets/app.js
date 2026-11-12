@@ -46,8 +46,11 @@
   };
   state.paused = state.reduceMotion;
 
-  const canvas = document.getElementById("map");
+  const canvas = document.getElementById("map"); // base: land and tints
   const ctx = canvas.getContext("2d");
+  const topCanvas = document.getElementById("top"); // lines, labels, links; receives zoom gestures
+  const topCtx = topCanvas.getContext("2d");
+  const wavesEl = document.getElementById("waves");
   const wrap = document.getElementById("mapwrap");
   const markersEl = document.getElementById("markers");
   const popup = document.getElementById("popup");
@@ -78,6 +81,8 @@
   const tx = (obj) => (obj == null ? "" : typeof obj === "string" ? obj : (obj[state.lang] ?? obj.en ?? ""));
 
   // ---------- wave tiles ----------
+  // Waves are CSS layers: an oversized strip with a repeating wave tile, slid by one
+  // wavelength in an endless linear animation (runs on the compositor), masked to the map area.
   const tiles = {};
   function makeTile(hz, period, offset) {
     const lam = WAVE.lambda[hz];
@@ -97,20 +102,51 @@
       if (x === -2) g.moveTo(x, y); else g.lineTo(x, y);
     }
     g.stroke();
-    return { pattern: ctx.createPattern(c, "repeat"), sx: lam / c.width, sy: h / c.height };
+    return { url: c.toDataURL(), w: lam, h, hz };
   }
   function buildTiles() {
     tiles["50"] = makeTile(50, 1, 0);
     tiles["60"] = makeTile(60, 1, 0);
     tiles["50h"] = makeTile(50, 2, 0);
     tiles["60h"] = makeTile(60, 2, 1);
+    document.querySelectorAll("[data-tile]").forEach(styleStrip);
   }
-  function fillWaves(path, key, hz, time) {
-    const tile = tiles[key];
-    const phase = (time * WAVE.speed[hz]) % WAVE.lambda[hz];
-    tile.pattern.setTransform(new DOMMatrix([tile.sx, 0, 0, tile.sy, phase, 0]));
-    ctx.fillStyle = tile.pattern;
-    ctx.fill(path);
+  const anims = new Set();
+  function styleStrip(strip) {
+    const tile = tiles[strip.dataset.tile];
+    if (!tile) return;
+    strip.style.backgroundImage = `url(${tile.url})`;
+    strip.style.backgroundSize = `${tile.w}px ${tile.h}px`;
+    strip.style.left = `${-tile.w}px`;
+    strip.style.width = `calc(100% + ${2 * tile.w}px)`;
+  }
+  // creates an element whose content is an endlessly moving wave strip
+  function waveBox(key, className) {
+    const box = document.createElement("div");
+    box.className = className;
+    const strip = document.createElement("div");
+    strip.className = "wave-strip";
+    strip.dataset.tile = key;
+    box.appendChild(strip);
+    styleStrip(strip);
+    const hz = key.startsWith("50") ? 50 : 60;
+    const lam = WAVE.lambda[hz];
+    const anim = strip.animate(
+      [{ transform: "translateX(0px)" }, { transform: `translateX(${lam}px)` }],
+      { duration: (lam / WAVE.speed[hz]) * 1000, iterations: Infinity, easing: "linear" }
+    );
+    if (state.paused) anim.pause();
+    anims.add(anim);
+    box._anim = anim;
+    return box;
+  }
+  function dropBox(box) {
+    if (box._anim) { box._anim.cancel(); anims.delete(box._anim); }
+    box.remove();
+  }
+  function setPaused(p) {
+    state.paused = p;
+    anims.forEach((a) => (p ? a.pause() : a.play()));
   }
 
   // ---------- projections & layers ----------
@@ -224,135 +260,205 @@
       P.muni = k >= 2.5 ? mk(L.munilines) : null;
       P.hzline = mk(L.hzline);
     }
-    const links = (state.sites[state.view].links || []).map((ln) => {
-      const p = new Path2D();
-      const a = projection(ln.from), b = projection(ln.to);
-      if (a && b) { p.moveTo(a[0], a[1]); p.lineTo(b[0], b[1]); }
-      return p;
-    });
-    P.links = links;
-    state.dirty = false;
     placeMarkers();
   }
 
   // ---------- draw ----------
-  function draw(time) {
-    if (state.dirty) buildPaths();
-    const s = time / 1000;
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.fillStyle = COLORS.bg;
-    ctx.fillRect(0, 0, W, H);
+  // The map is drawn when the view, language, size or zoom settles. While zooming,
+  // the drawn layers are moved with CSS transforms, and the waves keep running.
+  let cx = ctx; // context used by the line and label helpers
+  const layers = {
+    base: { el: canvas, tr: null },
+    top: { el: topCanvas, tr: null },
+    waves: {} // hz -> { box: [elements], url, tr, canvas }
+  };
+  let renderGen = 0;
+  function sizeCanvas(c) {
+    c.width = Math.round(W * DPR);
+    c.height = Math.round(H * DPR);
+  }
+  function begin(g) {
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, g.canvas.width, g.canvas.height);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    return g;
+  }
+  // Runs fnCoarse(groups) outside the detail box and fnDetail(groups) inside it (Paraguay zoom).
+  function byRegion(g, fnCoarse, fnDetail) {
+    if (state.view === "py" && P.useDetail) {
+      g.save();
+      const outside = new Path2D();
+      outside.rect(-50, -50, W + 100, H + 100);
+      outside.addPath(P.detailClip);
+      g.clip(outside, "evenodd");
+      fnCoarse(P.coarse);
+      g.restore();
+      g.save();
+      g.clip(P.detailClip);
+      fnDetail(P.groups);
+      g.restore();
+    } else {
+      fnCoarse(P.groups);
+    }
+  }
+  function renderStatic() {
+    if (!projection || !state.sites) return;
+    const gen = ++renderGen;
+    buildPaths();
+    const tr = state.transform;
 
-    ctx.fillStyle = COLORS.land;
-    ctx.fill(P.land);
+    // base: land and the light tint of each frequency
+    let g = begin(ctx);
+    g.fillStyle = COLORS.land;
+    g.fill(P.land);
+    const tints = (groups) => groups.forEach((gr) => {
+      if (gr.hz === "mixed") return;
+      g.fillStyle = COLORS.tint[gr.hz];
+      g.fill(gr.path);
+    });
+    byRegion(g, tints, (groups) => {
+      g.fillStyle = COLORS.bg;
+      g.fill(P.detailClip);
+      g.fillStyle = COLORS.land;
+      g.fill(P.detailLand);
+      tints(groups);
+    });
+    layers.base.tr = tr;
 
+    // top: water, lines, labels, DC links
+    g = begin(topCtx);
+    cx = g;
     if (state.view === "py") {
-      if (P.useDetail) {
-        ctx.save();
-        // coarse outside the detail box
-        const outside = new Path2D();
-        outside.rect(-50, -50, W + 100, H + 100);
-        outside.addPath(P.detailClip);
-        ctx.clip(outside, "evenodd");
-        P.coarse.forEach((g) => paintGroup(g, s));
-        ctx.restore();
-        ctx.save();
-        ctx.clip(P.detailClip);
-        ctx.fillStyle = COLORS.bg;
-        ctx.fill(P.detailClip);
-        ctx.fillStyle = COLORS.land;
-        ctx.fill(P.detailLand);
-        P.groups.forEach((g) => paintGroup(g, s));
-        ctx.fillStyle = COLORS.water;
-        ctx.fill(P.lakes);
-        ctx.restore();
-      } else {
-        P.groups.forEach((g) => paintGroup(g, s));
-        ctx.fillStyle = COLORS.water;
-        ctx.fill(P.lakes);
-      }
-      ctx.strokeStyle = COLORS.river;
-      ctx.lineWidth = P.useDetail ? 1.6 : 0.9;
-      ctx.stroke(P.rivers);
-      ctx.strokeStyle = COLORS.border;
-      ctx.lineWidth = 0.8;
-      if (P.useDetail) {
-        ctx.save();
-        const outside = new Path2D();
-        outside.rect(-50, -50, W + 100, H + 100);
-        outside.addPath(P.detailClip);
-        ctx.clip(outside, "evenodd");
-        ctx.stroke(P.cborders);
-        strokeHz(P.chzline);
-        ctx.restore();
-        ctx.save();
-        ctx.clip(P.detailClip);
-        ctx.stroke(P.borders);
-        strokeHz(P.hzline);
-        ctx.restore();
-      } else {
-        ctx.stroke(P.borders);
-        strokeHz(P.hzline);
-      }
+      g.fillStyle = COLORS.water;
+      if (P.useDetail) { g.save(); g.clip(P.detailClip); g.fill(P.lakes); g.restore(); }
+      else g.fill(P.lakes);
+      g.strokeStyle = COLORS.river;
+      g.lineWidth = P.useDetail ? 1.6 : 0.9;
+      g.stroke(P.rivers);
+      byRegion(g,
+        () => { g.strokeStyle = COLORS.border; g.lineWidth = 0.8; g.stroke(P.useDetail ? P.cborders : P.borders); strokeHz(P.useDetail ? P.chzline : P.hzline); },
+        () => { g.strokeStyle = COLORS.border; g.lineWidth = 0.8; g.stroke(P.borders); strokeHz(P.hzline); });
       drawCountryLabels();
     } else {
-      P.groups.forEach((g) => paintGroup(g, s));
-      ctx.fillStyle = COLORS.land;
-      ctx.fill(P.nodata);
+      g.fillStyle = COLORS.land;
+      g.fill(P.nodata);
       if (P.muni) {
-        ctx.strokeStyle = COLORS.muni;
-        ctx.lineWidth = 0.6;
-        ctx.stroke(P.muni);
+        g.strokeStyle = COLORS.muni;
+        g.lineWidth = 0.6;
+        g.stroke(P.muni);
       }
-      ctx.strokeStyle = COLORS.border;
-      ctx.lineWidth = 0.7;
-      ctx.stroke(P.pref);
+      g.strokeStyle = COLORS.border;
+      g.lineWidth = 0.7;
+      g.stroke(P.pref);
       strokeHz(P.hzline);
       drawJapanLabels();
     }
+    g.save();
+    g.setLineDash([6, 4]);
+    g.strokeStyle = COLORS.dc;
+    g.lineWidth = 2;
+    (state.sites[state.view].links || []).forEach((ln) => {
+      const a = projection(ln.from), b = projection(ln.to);
+      if (!a || !b) return;
+      g.beginPath();
+      g.moveTo(a[0], a[1]);
+      g.lineTo(b[0], b[1]);
+      g.stroke();
+    });
+    g.restore();
+    cx = ctx;
+    layers.top.tr = tr;
 
-    // HVDC links
-    ctx.save();
-    ctx.setLineDash([6, 4]);
-    ctx.lineDashOffset = state.paused ? 0 : -(s * 12) % 10;
-    ctx.strokeStyle = COLORS.dc;
-    ctx.lineWidth = 2;
-    P.links.forEach((p) => ctx.stroke(p));
-    ctx.restore();
+    // wave masks (white where a frequency is), handed to CSS as images
+    const present = ["50", "60", "mixed"].filter((hz) => (P.coarse || P.groups).some((gr) => gr.hz === hz));
+    Object.keys(layers.waves).forEach((hz) => {
+      if (!present.includes(hz) || layers.waves[hz].view !== state.view) removeWave(hz);
+    });
+    present.forEach((hz) => {
+      let lw = layers.waves[hz];
+      if (!lw) {
+        const keys = hz === "mixed" ? ["50h", "60h"] : [hz];
+        lw = layers.waves[hz] = { boxes: keys.map((k) => waveBox(k, "wave")), canvas: document.createElement("canvas"), url: null, tr: null, view: state.view };
+        lw.boxes.forEach((b) => { b.style.visibility = "hidden"; wavesEl.appendChild(b); });
+      }
+      sizeCanvas(lw.canvas);
+      const m = begin(lw.canvas.getContext("2d"));
+      m.fillStyle = "#fff";
+      const fill = (groups) => groups.forEach((gr) => { if (gr.hz === hz) m.fill(gr.path); });
+      byRegion(m, fill, fill);
+      lw.canvas.toBlob((blob) => {
+        if (gen !== renderGen || layers.waves[hz] !== lw || !blob) return;
+        const url = URL.createObjectURL(blob);
+        if (lw.url) URL.revokeObjectURL(lw.url);
+        lw.url = url;
+        lw.tr = tr;
+        lw.boxes.forEach((b) => {
+          b.style.webkitMaskImage = b.style.maskImage = `url(${url})`;
+          b.style.visibility = "";
+        });
+        positionLayers();
+      });
+    });
+    state.dirty = false;
+    positionLayers();
+  }
+  function removeWave(hz) {
+    const lw = layers.waves[hz];
+    if (!lw) return;
+    lw.boxes.forEach(dropBox);
+    if (lw.url) URL.revokeObjectURL(lw.url);
+    delete layers.waves[hz];
+  }
+  // where a layer drawn at transform t0 has to go for the current transform
+  function rel(t0) {
+    const t1 = state.transform;
+    const r = t1.k / t0.k;
+    return { r, dx: t1.x - r * t0.x, dy: t1.y - r * t0.y };
+  }
+  function positionLayers() {
+    [layers.base, layers.top].forEach((l) => {
+      if (!l.tr) return;
+      const { r, dx, dy } = rel(l.tr);
+      l.el.style.transform = r === 1 && dx === 0 && dy === 0 ? "" : `matrix(${r},0,0,${r},${dx},${dy})`;
+    });
+    Object.values(layers.waves).forEach((lw) => {
+      if (!lw.tr) return;
+      const { r, dx, dy } = rel(lw.tr);
+      lw.boxes.forEach((b) => {
+        b.style.webkitMaskSize = b.style.maskSize = `${W * r}px ${H * r}px`;
+        b.style.webkitMaskPosition = b.style.maskPosition = `${dx}px ${dy}px`;
+      });
+    });
+  }
+  let renderReq = null;
+  function scheduleRender() {
+    if (renderReq != null) return;
+    renderReq = requestAnimationFrame(() => {
+      renderReq = null;
+      renderStatic();
+    });
   }
 
-  function paintGroup(g, s) {
-    if (g.hz !== "mixed") {
-      ctx.fillStyle = COLORS.tint[g.hz];
-      ctx.fill(g.path);
-    }
-    if (g.hz === "mixed") {
-      fillWaves(g.path, "50h", 50, s);
-      fillWaves(g.path, "60h", 60, s);
-    } else {
-      fillWaves(g.path, g.hz, +g.hz, s);
-    }
-  }
   function strokeHz(path) {
-    ctx.strokeStyle = "rgba(16,21,28,0.9)";
-    ctx.lineWidth = 6;
-    ctx.stroke(path);
-    ctx.strokeStyle = COLORS.line;
-    ctx.lineWidth = 2.6;
-    ctx.stroke(path);
+    cx.strokeStyle = "rgba(16,21,28,0.9)";
+    cx.lineWidth = 6;
+    cx.stroke(path);
+    cx.strokeStyle = COLORS.line;
+    cx.lineWidth = 2.6;
+    cx.stroke(path);
   }
 
   function label(text, lon, lat, opts = {}) {
     const p = projection([lon, lat]);
     if (!p) return;
-    ctx.font = `${opts.weight || 600} ${opts.size || 12}px ${getComputedStyle(document.body).fontFamily}`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgba(16,21,28,0.92)";
-    ctx.strokeText(text, p[0], p[1]);
-    ctx.fillStyle = opts.color || COLORS.label;
-    ctx.fillText(text, p[0], p[1]);
+    cx.font = `${opts.weight || 600} ${opts.size || 12}px ${getComputedStyle(document.body).fontFamily}`;
+    cx.textAlign = "center";
+    cx.textBaseline = "middle";
+    cx.lineWidth = 4;
+    cx.strokeStyle = "rgba(16,21,28,0.92)";
+    cx.strokeText(text, p[0], p[1]);
+    cx.fillStyle = opts.color || COLORS.label;
+    cx.fillText(text, p[0], p[1]);
   }
   function drawCountryLabels() {
     const k = state.transform.k;
@@ -422,13 +528,20 @@
   // ---------- zoom ----------
   const zoom = d3.zoom()
     .scaleExtent([0.8, 60])
+    .on("start", () => { state.zooming = true; })
     .on("zoom", (e) => {
       state.transform = e.transform;
-      state.dirty = true;
-      if (state.paused) requestDraw();
+      if (!base) return;
+      applyTransform();
+      placeMarkers();
+      positionLayers();
+    })
+    .on("end", () => {
+      state.zooming = false;
+      scheduleRender();
     });
-  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
-  canvas.addEventListener("click", closePopup);
+  d3.select(topCanvas).call(zoom).on("dblclick.zoom", null);
+  topCanvas.addEventListener("click", closePopup);
 
   function presetTransform(bbox) {
     // bbox: [w, s, e, n]
@@ -447,7 +560,7 @@
     const tr = pr.bbox ? presetTransform(pr.bbox) : d3.zoomIdentity;
     state.preset = i;
     updatePresetButtons();
-    const sel = d3.select(canvas);
+    const sel = d3.select(topCanvas);
     if (animate && !state.reduceMotion) sel.transition().duration(1400).call(zoom.transform, tr);
     else sel.call(zoom.transform, tr);
   }
@@ -525,15 +638,20 @@
     items.push({ kind: "line", text: state.view === "py" ? T.ui.legLinePy : T.ui.legLineJp });
     (state.view === "py" ? ["dam", "fc", "dc"] : ["fc", "dc"]).forEach((m) => items.push({ kind: "marker", m, text: T.ui["legM_" + m + "_" + state.view] || T.ui["legM_" + m] }));
     items.push({ kind: "link", text: T.ui.legLink });
+    lg.querySelectorAll(".sw-layer").forEach(dropBox);
     lg.innerHTML = "";
     items.forEach((it) => {
       const row = document.createElement("div");
       row.className = "row";
       let sw;
-      if (it.kind === "wave" || it.kind === "none") {
-        sw = document.createElement("canvas");
-        sw.width = 64 * DPR; sw.height = 22 * DPR;
-        sw.dataset.hz = it.kind === "none" ? "" : it.hz;
+      if (it.kind === "wave") {
+        sw = document.createElement("span");
+        sw.className = "sw-wave";
+        if (it.hz === "mixed") sw.append(waveBox("50h", "sw-layer"), waveBox("60h", "sw-layer"));
+        else { sw.style.background = COLORS.tint[it.hz]; sw.append(waveBox(it.hz, "sw-layer")); }
+      } else if (it.kind === "none") {
+        sw = document.createElement("span");
+        sw.className = "sw-wave";
       } else if (it.kind === "line") {
         sw = document.createElement("span"); sw.className = "sw-line";
       } else if (it.kind === "link") {
@@ -548,26 +666,6 @@
       lg.appendChild(row);
     });
   }
-  function drawLegendSwatches(s) {
-    document.querySelectorAll("#legend canvas").forEach((c) => {
-      const g = c.getContext("2d");
-      g.setTransform(DPR, 0, 0, DPR, 0, 0);
-      g.fillStyle = COLORS.land;
-      g.fillRect(0, 0, 64, 22);
-      const hz = c.dataset.hz;
-      if (!hz) return;
-      if (hz !== "mixed") { g.fillStyle = COLORS.tint[hz]; g.fillRect(0, 0, 64, 22); }
-      const draw1 = (key, h) => {
-        const tile = tiles[key];
-        const phase = (s * WAVE.speed[h]) % WAVE.lambda[h];
-        tile.pattern.setTransform(new DOMMatrix([tile.sx, 0, 0, tile.sy, phase, 0]));
-        g.fillStyle = tile.pattern;
-        g.fillRect(0, 0, 64, 22);
-      };
-      if (hz === "mixed") { draw1("50h", 50); draw1("60h", 60); } else draw1(hz, +hz);
-    });
-  }
-
   function unitsDiagram() {
     const u = T.itaipuUnits;
     const cw = 28, ch = 34, gap = 4, labelH = 18, rowGap = 10;
@@ -659,38 +757,22 @@
     prepareView(v);
     fitBase();
     state.preset = 0;
-    d3.select(canvas).interrupt().call(zoom.transform, d3.zoomIdentity);
-    state.dirty = true;
+    Object.keys(layers.waves).forEach(removeWave);
+    d3.select(topCanvas).interrupt().call(zoom.transform, d3.zoomIdentity);
     renderPanel();
-    requestDraw();
+    scheduleRender();
   }
   function setLang(l) {
     state.lang = l;
     writeURL();
     renderPanel();
-    requestDraw();
+    scheduleRender();
   }
   document.querySelectorAll("#view-switch button").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
   document.getElementById("motion-toggle").addEventListener("click", () => {
-    state.paused = !state.paused;
+    setPaused(!state.paused);
     renderPanel();
-    requestDraw();
   });
-
-  // ---------- loop ----------
-  let frameReq = null;
-  let frozenTime = 0;
-  function frame(time) {
-    frameReq = null;
-    const tm = state.paused ? frozenTime : time;
-    if (!state.paused) frozenTime = time;
-    draw(tm);
-    drawLegendSwatches(tm / 1000);
-    if (!state.paused) frameReq = requestAnimationFrame(frame);
-  }
-  function requestDraw() {
-    if (frameReq == null) frameReq = requestAnimationFrame(frame);
-  }
 
   function resize() {
     const r = wrap.getBoundingClientRect();
@@ -699,15 +781,14 @@
     const newDPR = Math.min(window.devicePixelRatio || 1, 2);
     const dprChanged = newDPR !== DPR;
     DPR = newDPR;
-    canvas.width = Math.round(W * DPR);
-    canvas.height = Math.round(H * DPR);
-    if (dprChanged || !tiles["50"]) { buildTiles(); renderLegend(); }
+    sizeCanvas(canvas);
+    sizeCanvas(topCanvas);
+    if (dprChanged || !tiles["50"]) buildTiles();
     fitBase();
     const keep = state.preset || 0;
-    d3.select(canvas).interrupt();
+    d3.select(topCanvas).interrupt();
     goPreset(keep, false);
-    state.dirty = true;
-    requestDraw();
+    scheduleRender();
   }
 
   // ---------- init ----------

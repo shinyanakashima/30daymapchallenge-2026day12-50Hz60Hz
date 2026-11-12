@@ -70,15 +70,19 @@ for (const [view, lang] of combos) {
     await page.click('.tone[data-hz="60"]');
     await page.click('.tone[data-hz="60"]');
 
-    // canvas is not blank
+    // map layers are drawn and the wave layers have their masks
     const nonBlank = await page.evaluate(() => {
-      const c = document.getElementById("map");
-      const g = c.getContext("2d");
-      const d = g.getImageData(0, 0, c.width, c.height).data;
       let lit = 0;
-      for (let i = 0; i < d.length; i += 4) if (d[i] > 120) lit++;
+      for (const id of ["map", "top"]) {
+        const c = document.getElementById(id);
+        const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+        for (let i = 3; i < d.length; i += 4) if (d[i] > 0) lit++;
+      }
       return lit;
     });
+    const masked = await page.evaluate(() => [...document.querySelectorAll("#waves .wave")]
+      .filter((w) => w.style.visibility !== "hidden" && /blob:/.test(w.style.maskImage || w.style.webkitMaskImage)).length);
+    if (masked < 2) problems.push("wave layers missing");
     if (nonBlank < 500) problems.push("canvas looks blank");
 
     // view switch keeps/changes language
