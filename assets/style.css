@@ -5,7 +5,8 @@
   --ink-soft: #a9a497;
   --line: #3a4552;
   --accent: #f0b54a;
-  --dc: #7fc8d8;
+  --dc: #c4a8ff;
+  --line: #ffffff;
   --panel: #141a22;
   --font: "Helvetica Neue", Arial, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
   color-scheme: dark;
@@ -162,7 +163,7 @@ a { color: var(--accent); }
 .legend { display: grid; gap: 6px; margin-top: 10px; }
 .legend .row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .legend canvas { width: 64px; height: 22px; border: 1px solid var(--line); border-radius: 3px; background: var(--land); flex: none; }
-.legend .sw-line { width: 64px; height: 0; border-top: 3px solid var(--accent); flex: none; }
+.legend .sw-line { width: 64px; height: 0; border-top: 3px solid var(--line); box-shadow: 0 0 0 1px #10151c; flex: none; }
 .legend .sw-dc { width: 64px; height: 0; border-top: 2px dashed var(--dc); flex: none; }
 .legend .sym-wrap { width: 64px; display: flex; justify-content: center; flex: none; }
 .legend .marker { position: static; transform: none; padding: 0; pointer-events: none; }

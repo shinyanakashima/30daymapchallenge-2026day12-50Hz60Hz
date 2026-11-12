@@ -74,15 +74,15 @@ window.I18N = (() => {
   ];
 
   const japanLabels = [
-    { name: { en: "50 Hz", ja: "50Hz" }, at: [141.6, 38.4], size: 22, maxK: 2.2 },
-    { name: { en: "60 Hz", ja: "60Hz" }, at: [133.6, 35.6], size: 22, maxK: 2.2 },
+    { name: { en: "50 Hz", ja: "50Hz" }, at: [141.6, 38.4], size: 22, maxK: 2.2, color: "#5fb0f2" },
+    { name: { en: "60 Hz", ja: "60Hz" }, at: [133.6, 35.6], size: 22, maxK: 2.2, color: "#ff9a45" },
     { name: { en: "Okinawa 60 Hz", ja: "沖縄 60Hz" }, at: [127.8, 27.0], size: 12, weight: 400, maxK: 2.2 },
-    { name: { en: "Fuji River", ja: "富士川" }, at: [138.62, 35.36], size: 12, weight: 400, minK: 2.2, color: "#f0b54a" },
-    { name: { en: "Itoigawa", ja: "糸魚川" }, at: [137.86, 37.12], size: 12, weight: 400, minK: 2.2, color: "#f0b54a" },
+    { name: { en: "Fuji River", ja: "富士川" }, at: [138.62, 35.36], size: 12, weight: 400, minK: 2.2, color: "#ffffff" },
+    { name: { en: "Itoigawa", ja: "糸魚川" }, at: [137.86, 37.12], size: 12, weight: 400, minK: 2.2, color: "#ffffff" },
     { name: { en: "Sado 60 Hz", ja: "佐渡 60Hz" }, at: [138.38, 38.25], size: 12, weight: 400, minK: 2.2 },
-    { name: { en: "50 Hz", ja: "50Hz" }, at: [139.3, 36.35], size: 18, minK: 2.2, maxK: 8 },
-    { name: { en: "60 Hz", ja: "60Hz" }, at: [137.0, 35.25], size: 18, minK: 2.2, maxK: 8 },
-    { name: { en: "Tsugaru Strait", ja: "津軽海峡" }, at: [140.75, 41.42], size: 12, weight: 400, minK: 4, color: "#7fc8d8" }
+    { name: { en: "50 Hz", ja: "50Hz" }, at: [139.3, 36.35], size: 18, minK: 2.2, maxK: 8, color: "#5fb0f2" },
+    { name: { en: "60 Hz", ja: "60Hz" }, at: [137.0, 35.25], size: 18, minK: 2.2, maxK: 8, color: "#ff9a45" },
+    { name: { en: "Tsugaru Strait", ja: "津軽海峡" }, at: [140.75, 41.42], size: 12, weight: 400, minK: 4, color: "#c4a8ff" }
   ];
 
   const itaipuUnits = {

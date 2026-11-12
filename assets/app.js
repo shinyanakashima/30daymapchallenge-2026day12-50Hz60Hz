@@ -22,9 +22,12 @@
     border: "rgba(160,170,182,0.55)",
     muni: "rgba(160,170,182,0.18)",
     accent: "#f0b54a",
-    dc: "#7fc8d8",
+    line: "#ffffff",
+    dc: "#c4a8ff",
+    wave: { 50: "#5fb0f2", 60: "#ff9a45" },
+    tint: { 50: "rgba(95,176,242,0.14)", 60: "rgba(255,154,69,0.14)" },
     water: "#0c1218",
-    river: "rgba(127,200,216,0.55)",
+    river: "rgba(180,192,204,0.45)",
     label: "rgba(233,228,216,0.72)",
     nodata: "rgba(160,170,182,0.35)"
   };
@@ -84,7 +87,7 @@
     c.height = Math.round(h * DPR);
     const g = c.getContext("2d");
     g.scale(c.width / lam, c.height / h);
-    g.strokeStyle = COLORS.ink;
+    g.strokeStyle = COLORS.wave[hz];
     g.lineWidth = WAVE.width;
     g.lineCap = "round";
     const y0 = WAVE.gap * offset + WAVE.gap / 2;
@@ -319,6 +322,10 @@
   }
 
   function paintGroup(g, s) {
+    if (g.hz !== "mixed") {
+      ctx.fillStyle = COLORS.tint[g.hz];
+      ctx.fill(g.path);
+    }
     if (g.hz === "mixed") {
       fillWaves(g.path, "50h", 50, s);
       fillWaves(g.path, "60h", 60, s);
@@ -330,7 +337,7 @@
     ctx.strokeStyle = "rgba(16,21,28,0.9)";
     ctx.lineWidth = 6;
     ctx.stroke(path);
-    ctx.strokeStyle = COLORS.accent;
+    ctx.strokeStyle = COLORS.line;
     ctx.lineWidth = 2.6;
     ctx.stroke(path);
   }
@@ -356,7 +363,7 @@
       label(name, c.at[0], c.at[1], { size: k >= 4 ? 14 : 12 });
       const p = projection(c.at);
       if (!p) return;
-      label(hz, ...projection.invert([p[0], p[1] + 14]), { size: 11, weight: 400 });
+      label(hz, ...projection.invert([p[0], p[1] + 14]), { size: 11, weight: 700, color: COLORS.wave[c.hz] || COLORS.label });
     });
   }
   function drawJapanLabels() {
@@ -549,6 +556,7 @@
       g.fillRect(0, 0, 64, 22);
       const hz = c.dataset.hz;
       if (!hz) return;
+      if (hz !== "mixed") { g.fillStyle = COLORS.tint[hz]; g.fillRect(0, 0, 64, 22); }
       const draw1 = (key, h) => {
         const tile = tiles[key];
         const phase = (s * WAVE.speed[h]) % WAVE.lambda[h];
@@ -565,16 +573,16 @@
     const cw = 28, ch = 34, gap = 4, labelH = 18, rowGap = 10;
     const w = 10 * cw + 9 * gap;
     const defs = `<defs>
-      <pattern id="pw50" width="${WAVE.lambda[50] / 2}" height="7" patternUnits="userSpaceOnUse">${wavePathSVG(WAVE.lambda[50] / 2, 7)}</pattern>
-      <pattern id="pw60" width="${WAVE.lambda[60] / 2}" height="7" patternUnits="userSpaceOnUse">${wavePathSVG(WAVE.lambda[60] / 2, 7)}</pattern>
+      <pattern id="pw50" width="${WAVE.lambda[50] / 2}" height="7" patternUnits="userSpaceOnUse">${wavePathSVG(WAVE.lambda[50] / 2, 7, COLORS.wave[50])}</pattern>
+      <pattern id="pw60" width="${WAVE.lambda[60] / 2}" height="7" patternUnits="userSpaceOnUse">${wavePathSVG(WAVE.lambda[60] / 2, 7, COLORS.wave[60])}</pattern>
     </defs>`;
     let body = "";
     [[50, u.left], [60, u.right]].forEach(([hz, txt], r) => {
       const y0 = r * (labelH + ch + rowGap);
-      body += `<text x="0" y="${y0 + 12}" font-size="12" fill="#e9e4d8">${esc(tx(txt))}</text>`;
+      body += `<text x="0" y="${y0 + 12}" font-size="12" font-weight="700" fill="${COLORS.wave[hz]}">${esc(tx(txt))}</text>`;
       for (let i = 0; i < 10; i++) {
         const x = i * (cw + gap);
-        body += `<rect x="${x}" y="${y0 + labelH}" width="${cw}" height="${ch}" rx="2" fill="#18202a" stroke="#5a6572"/>` +
+        body += `<rect x="${x}" y="${y0 + labelH}" width="${cw}" height="${ch}" rx="2" fill="${COLORS.tint[hz]}" stroke="${COLORS.wave[hz]}" stroke-opacity="0.6"/>` +
           `<rect x="${x + 1}" y="${y0 + labelH + 1}" width="${cw - 2}" height="${ch - 2}" fill="url(#pw${hz})"/>`;
       }
     });
@@ -582,13 +590,13 @@
     const svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(tx(u.aria))}">${defs}${body}</svg>`;
     return `<h2>${esc(tx(u.title))}</h2><div class="units">${svg}<p class="cap">${tx(u.caption)}</p></div>`;
   }
-  function wavePathSVG(lam, h) {
+  function wavePathSVG(lam, h, color) {
     let d = "";
     for (let x = -1; x <= lam + 1; x += 0.5) {
       const y = h / 2 + 2 * Math.sin((2 * Math.PI * x) / lam);
       d += (d ? " L" : "M") + x.toFixed(2) + " " + y.toFixed(2);
     }
-    return `<path d="${d}" fill="none" stroke="#e9e4d8" stroke-width="0.9"/>`;
+    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="1"/>`;
   }
 
   // ---------- sound ----------
