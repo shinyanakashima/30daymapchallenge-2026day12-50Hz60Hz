@@ -5,9 +5,9 @@ window.I18N = (() => {
     zoom: { es: "Zoom", en: "Zoom", ja: "ズーム" },
     soundTitle: { es: "Escuchar 50 Hz y 60 Hz", en: "Listen: 50 Hz vs 60 Hz", ja: "50Hz と 60Hz を聞き比べる" },
     soundHint: {
-      es: "Sin sonido hasta que pulse un botón. Volumen bajo. Se suma el armónico de 100 Hz / 120 Hz para que se oiga también en altavoces de teléfono.",
-      en: "Silent until you press a button. Low volume. The 100 Hz / 120 Hz overtone is added so phone speakers can play it too.",
-      ja: "ボタンを押すまで音は出ません。音量は控えめです。スマートフォンのスピーカーでも聞こえるよう、100Hz / 120Hz の倍音を重ねています。"
+      es: "Sin sonido hasta que pulse un botón. Volumen bajo. Se suman armónicos (100 Hz / 120 Hz y superiores) para que se oiga también en altavoces pequeños. En iPhone, compruebe el volumen.",
+      en: "Silent until you press a button. Low volume. Overtones (100 Hz / 120 Hz and above) are added so small speakers can play it too. On iPhone, check the volume.",
+      ja: "ボタンを押すまで音は出ません。音量は控えめです。スマートフォンなど小さなスピーカーでも聞こえるよう、倍音（100Hz / 120Hz とその上）を重ねています。iPhone では音量を確認してください。"
     },
     stop: { es: "detener", en: "stop", ja: "停止" },
     pause: { es: "Pausar ondas", en: "Pause waves", ja: "波を止める" },

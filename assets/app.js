@@ -607,26 +607,31 @@
     if (!audio) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
+      // iOS: let Web Audio play even when the ring/silent switch is on silent
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { /* not supported */ }
       audio = { ctx: new AC() };
     }
-    if (audio.ctx.state === "suspended") audio.ctx.resume();
-    stopTone();
     const c = audio.ctx;
+    if (c.state !== "running") c.resume();
+    stopTone();
+    const now = c.currentTime;
     const gain = c.createGain();
-    gain.gain.value = 0;
+    gain.gain.setValueAtTime(0, now);
     gain.connect(c.destination);
-    const parts = [[hz, 0.55], [hz * 2, 0.45]];
-    const oscs = parts.map(([f, a]) => {
+    // Fundamental + 2nd harmonic (100 / 120 Hz), plus weaker 3rd-5th harmonics
+    // so that small speakers, which cannot reproduce 50-60 Hz, still sound the tone.
+    const parts = [[1, 0.5], [2, 0.45], [3, 0.22], [4, 0.14], [5, 0.08]];
+    const oscs = parts.map(([n, a]) => {
       const o = c.createOscillator();
       o.type = "sine";
-      o.frequency.value = f;
+      o.frequency.setValueAtTime(hz * n, now);
       const g = c.createGain();
-      g.gain.value = a;
+      g.gain.setValueAtTime(a, now);
       o.connect(g).connect(gain);
-      o.start();
+      o.start(now);
       return o;
     });
-    gain.gain.linearRampToValueAtTime(0.12, c.currentTime + 0.25);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.25);
     audio.voice = { gain, oscs };
   }
   document.querySelectorAll(".tone").forEach((b) => b.addEventListener("click", () => {
